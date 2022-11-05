@@ -49,7 +49,6 @@ int main(int argc, char **argv, char **env){
 
         if(vbdFlag() == 1){
             top->en = 1;
-            usleep(1000);
         } else {
             top->en = 0;
         }

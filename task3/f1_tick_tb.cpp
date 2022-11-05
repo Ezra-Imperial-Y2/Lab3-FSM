@@ -1,6 +1,6 @@
 #include "verilated.h"
 #include "verilated_vcd_c.h"
-#include "Vclktick.h"
+#include "Vf1_tick.h"
 
 #include "vbuddy.cpp"     // include vbuddy code
 #define MAX_SIM_CYC 1000000
@@ -12,23 +12,23 @@ int main(int argc, char **argv, char **env) {
 
   Verilated::commandArgs(argc, argv);
   // init top verilog instance
-  Vclktick * top = new Vclktick;
+  Vf1_tick * top = new Vf1_tick;
   // init trace dump
   Verilated::traceEverOn(true);
   VerilatedVcdC* tfp = new VerilatedVcdC;
   top->trace (tfp, 99);
-  tfp->open ("clktick.vcd");
+  tfp->open ("f1_tick.vcd");
  
   // init Vbuddy
   if (vbdOpen()!=1) return(-1);
-  vbdHeader("L3T2:Clktick");
+  vbdHeader("L3T2:f1_tick");
   vbdSetMode(1);        // Flag mode set to one-shot
 
   // initialize simulation inputs
   top->clk = 1;
   top->rst = 0;
   top->en = 0;
-  top->N = vbdValue(); // value of N to give a tick period of 1 second
+  top->N = 77; // value of N to give a tick period of 1 second
   
   // run simulation for MAX_SIM_CYC clock cycles
   for (simcyc=0; simcyc<MAX_SIM_CYC; simcyc++) {
@@ -41,14 +41,12 @@ int main(int argc, char **argv, char **env) {
 
     // Display toggle neopixel
     if (top->tick) {
-      vbdBar(lights);
-      lights = lights ^ 0xFF;
+      vbdBar(top->lights & 0xFF);
     }
     // set up input signals of testbench
     top->rst = (simcyc < 2);    // assert reset for 1st cycle
     top->en = (simcyc > 2);
-    top->N = vbdValue();
-    // std::cout<<vbdValue()<<std::endl;
+    top->N = int(77);
     vbdCycle(simcyc);
 
     if (Verilated::gotFinish())  exit(0);
